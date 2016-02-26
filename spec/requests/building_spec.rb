@@ -22,6 +22,8 @@ describe "Building API" do
       expect(r['elevator_count']).to eq b[:building][:elevator_count]
       expect(Floor.count).to eq b[:building][:floor_count]
       expect(Elevator.count).to eq b[:building][:elevator_count]
+      expect(r['floors'].length).to eq Floor.count
+      expect(r['floors'][0]['id']).to eq Floor.last.id
     end
   end
 end
