@@ -16,6 +16,7 @@ describe "Floor API" do
       b = {building:{name:'My Building', floor_count:10, elevator_count:10}}
       post "/buildings", b.to_json, headers
       expect(Floor.top.waiting).to eq 0
+      expect(Elevator.where(moving:1).count).to eq 0
 
       # Request Elevator from top floor
       rq = {request: {direction:0}}
@@ -26,6 +27,8 @@ describe "Floor API" do
       r = (JSON.parse response.body)['request']
       expect(r['id']).to eq Request.first.id
       expect(r['direction']).to eq rq[:request][:direction]
+      expect(Elevator.where(moving:1).count).to eq 1
+      expect(Elevator.where(moving:1).first.destination).to eq Floor.top.idx
     end
   end
 end

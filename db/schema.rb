@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160226175706) do
+ActiveRecord::Schema.define(version: 20160226183345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 20160226175706) do
     t.integer  "building_id"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.integer  "destination"
   end
 
   add_index "elevators", ["building_id"], name: "index_elevators_on_building_id", using: :btree
@@ -64,7 +65,18 @@ ActiveRecord::Schema.define(version: 20160226175706) do
 
   add_index "requests", ["floor_id"], name: "index_requests_on_floor_id", using: :btree
 
+  create_table "trips", force: :cascade do |t|
+    t.integer  "origin"
+    t.integer  "destination"
+    t.integer  "elevator_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "trips", ["elevator_id"], name: "index_trips_on_elevator_id", using: :btree
+
   add_foreign_key "elevators", "buildings"
   add_foreign_key "floors", "buildings"
   add_foreign_key "requests", "floors"
+  add_foreign_key "trips", "elevators"
 end
