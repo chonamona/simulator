@@ -21,14 +21,29 @@ describe "Elevator API" do
       rq = {request: {direction:0}}
       post "/floors/#{Floor.top.id}/requests", rq.to_json, headers()
 
-      # #
-      #
-      # expect(response.status).to eq 201
-      # expect(Request.count).to eq 1
-      # expect(Floor.top.waiting).to eq 1
-      # r = (JSON.parse response.body)['request']
-      # expect(r['id']).to eq Request.first.id
-      # expect(r['direction']).to eq rq[:request][:direction]
+      e = Elevator.where(moving:1).first
+      expect(e.floor_idx).to eq 0
+
+      # Update Elevator when passing through floor
+      p = {elevator:{floor_idx: 1, closed_doors:1}}
+      put "/elevators/#{e.id}", p.to_json, headers()
+      expect(response.status).to eq 200
+      r = (JSON.parse response.body)['elevator']
+      expect(r['floor_idx']).to eq p[:elevator][:floor_idx]
+
+      # Update Elevator when opening doors
+      p = {elevator:{floor_idx: 2, closed_doors:0}}
+      put "/elevators/#{e.id}", p.to_json, headers()
+      expect(response.status).to eq 200
+      r = (JSON.parse response.body)['elevator']
+      expect(r['moving']).to eq 0
+
+
+      # Update Elevator after doors close
+      p = {elevator:{floor_idx: 2, closed_doors:1}}
+      put "/elevators/#{e.id}", p.to_json, headers()
+      expect(response.status).to eq 200
+      expect(e.moving).to eq 1
     end
   end
 end
